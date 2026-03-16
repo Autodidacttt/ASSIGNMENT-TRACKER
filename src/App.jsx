@@ -9,7 +9,7 @@ import Profile from "./Profile";
 import Subjects from "./Subjects";
 import Navbar from "./Navbar";
 import Login from "./Login";
-import "./App.css";
+import "./style.css";
 
 function App() {
   const [loggedIn, setLoggedIn]   = useState(false);
@@ -38,7 +38,7 @@ function App() {
       case "dashboard":
         return <Dashboard assignments={assignments} />;
       case "calendar":
-        return <Calendar assignments={assignments} />;
+        return <Calendar assignments={assignments} loadAssignments={loadAssignments} />;
       case "profile":
         return <Profile assignments={assignments} setLoggedIn={setLoggedIn} />;
       case "subjects":

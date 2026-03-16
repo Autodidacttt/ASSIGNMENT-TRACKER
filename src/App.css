@@ -866,6 +866,208 @@ body:has(.container:only-child) {
   animation: fadeUp 0.3s ease both;
 }
 
+.cal-events-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.2rem;
+}
+
+/* + button that appears on each day cell hover */
+.cal-add-btn {
+  display: none;
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 14px;
+  height: 14px;
+  font-size: 0.65rem;
+  line-height: 14px;
+  text-align: center;
+  background: rgba(201,131,122,0.25);
+  color: #c9837a;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.cal-day-cell:hover .cal-add-btn {
+  display: block;
+}
+
+/* Schedule button in day panel */
+.cal-schedule-btn {
+  background: transparent;
+  color: #c9837a;
+  border: 1px solid #c9837a;
+  border-radius: 10px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.45rem 1rem;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  white-space: nowrap;
+}
+
+.cal-schedule-btn:hover {
+  background: #c9837a;
+  color: #1a0f0e;
+}
+
+/* Remove due date button */
+.cal-remove-due {
+  background: none;
+  border: none;
+  color: #c97a7a;
+  font-size: 0.65rem;
+  cursor: pointer;
+  opacity: 0.5;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: opacity 0.18s ease;
+}
+.cal-remove-due:hover { opacity: 1; }
+
+/* ── SCHEDULE MODAL ── */
+.cal-modal {
+  background: #201818;
+  border: 1px solid #3d2c2c;
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  animation: fadeUp 0.3s ease both;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 32px rgba(201,131,122,0.1);
+}
+
+.cal-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cal-modal-close {
+  background: none;
+  border: none;
+  color: #7a6460;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.18s ease;
+}
+.cal-modal-close:hover { background: rgba(201,122,122,0.12); color: #c97a7a; }
+
+.cal-modal-tabs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cal-tab-btn {
+  flex: 1;
+  background: transparent;
+  border: 1px solid #3d2c2c;
+  border-radius: 10px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #7a6460;
+  padding: 0.6rem 0.5rem;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  text-align: center;
+}
+
+.cal-tab-btn:hover {
+  border-color: #c9837a;
+  color: #c4aea6;
+}
+
+.cal-tab-btn.active {
+  background: rgba(201,131,122,0.12);
+  border-color: #c9837a;
+  color: #c9837a;
+}
+
+.cal-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.cal-modal-input {
+  width: 100%;
+  background: #2a1f1f;
+  border: 1px solid #3d2c2c;
+  border-radius: 10px;
+  color: #f5ede6;
+  font-family: 'Jost', sans-serif;
+  font-size: 1rem;
+  padding: 0.85rem 1.1rem;
+  outline: none;
+  transition: border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.cal-modal-input:focus {
+  border-color: #c9837a;
+  box-shadow: 0 0 0 3px rgba(201,131,122,0.15);
+}
+
+.cal-modal-input::placeholder { color: #7a6460; }
+
+.cal-modal-select {
+  width: 100%;
+  background: #2a1f1f;
+  border: 1px solid #3d2c2c;
+  border-radius: 10px;
+  color: #f5ede6;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.95rem;
+  padding: 0.85rem 1.1rem;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.22s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a6460' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+}
+
+.cal-modal-select:focus { border-color: #c9837a; }
+.cal-modal-select option { background: #201818; color: #f5ede6; }
+
+.cal-modal-save {
+  width: 100%;
+  background: linear-gradient(135deg, #c9837a, #c9a96e);
+  color: #1a0f0e;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 0.9rem;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  box-shadow: 0 4px 20px rgba(201,131,122,0.25);
+}
+
+.cal-modal-save:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 28px rgba(201,131,122,0.35);
+}
+
+.cal-modal-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
 /* ============================================
    PROFILE
    ============================================ */
