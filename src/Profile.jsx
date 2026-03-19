@@ -1,47 +1,44 @@
 import React from "react";
 
-function Profile({ setLoggedIn, assignments }) {
-  const total = assignments.length;
+function Profile({ assignments, user, setUser }) {
+  const total     = assignments.length;
   const completed = assignments.filter((a) => a.status === "completed").length;
-  const pending = assignments.filter((a) => a.status === "pending").length;
-  const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
-
-  const handleLogout = () => {
-    setLoggedIn(false);
-  };
+  const pending   = assignments.filter((a) => a.status === "pending").length;
+  const percent   = total === 0 ? 0 : Math.round((completed / total) * 100);
+  const initials  = (user?.name || "S").slice(0, 2).toUpperCase();
 
   return (
     <div className="container">
       <h1 className="title">Profile</h1>
 
-      {/* Avatar */}
       <div className="profile-card">
-        <div className="profile-avatar">S</div>
-        <div className="profile-name">Student</div>
-        <div className="profile-role">student@school.com</div>
+        <div className="profile-avatar">{initials}</div>
+        <div className="profile-name">{user?.name || "Student"}</div>
+        <div className="profile-role">{user?.email}</div>
 
-        {/* Info rows */}
         <div className="profile-info">
           <div className="profile-row">
-            <span className="profile-key">Username</span>
-            <span className="profile-val">student</span>
+            <span className="profile-key">Name</span>
+            <span className="profile-val">{user?.name}</span>
           </div>
           <div className="profile-row">
-            <span className="profile-key">Password</span>
-            <span className="profile-val">••••</span>
+            <span className="profile-key">Email</span>
+            <span className="profile-val">{user?.email}</span>
+          </div>
+          <div className="profile-row">
+            <span className="profile-key">Role</span>
+            <span className="profile-val" style={{ textTransform: "capitalize" }}>{user?.role}</span>
           </div>
           <div className="profile-row">
             <span className="profile-key">Joined</span>
             <span className="profile-val">
-              {new Date().toLocaleString("default", {
-                month: "long",
-                year: "numeric",
-              })}
+              {user?.createdAt
+                ? new Date(user.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })
+                : "—"}
             </span>
           </div>
         </div>
 
-        {/* Mini stats */}
         <div className="profile-stats">
           <div className="profile-stat">
             <div className="stat-number rose">{total}</div>
@@ -57,7 +54,6 @@ function Profile({ setLoggedIn, assignments }) {
           </div>
         </div>
 
-        {/* Progress */}
         <div className="progress-section" style={{ width: "100%" }}>
           <div className="progress-header">
             <span className="progress-label">Completion Rate</span>
@@ -68,10 +64,7 @@ function Profile({ setLoggedIn, assignments }) {
           </div>
         </div>
 
-        {/* Logout */}
-        <button className="logout-btn" onClick={handleLogout}>
-          Logout
-        </button>
+        <button className="logout-btn" onClick={() => setUser(null)}>Logout</button>
       </div>
     </div>
   );
