@@ -1,5 +1,5 @@
 // Central API helper — replaces all Firebase calls
-const BASE = "assignment-tracker-production-b915.up.railway.app";
+const BASE = "https://assignment-tracker-production-b915.up.railway.app/api";
 
 const api = async (path, options = {}) => {
   const res = await fetch(`${BASE}${path}`, {
