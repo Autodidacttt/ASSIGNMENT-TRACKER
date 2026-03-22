@@ -12,6 +12,9 @@ const userRoutes       = require("./routes/users");
 const app  = express();
 const PORT = process.env.PORT || 5000;
 
+// ── Trust proxy (required for Railway) ──
+app.set("trust proxy", 1);
+
 // ── MongoDB ──
 mongoose
   .connect(process.env.MONGO_URI)
@@ -35,9 +38,10 @@ app.use(session({
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7,
     httpOnly: true,
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    secure: process.env.NODE_ENV === "production" ? true : false,
+    sameSite: "none",
+    secure: true,
   },
+  proxy: true,
 }));
 
 // ── Routes ──

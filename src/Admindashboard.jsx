@@ -14,21 +14,19 @@ function AdminDashboard({ user, setUser }) {
   const [assignTarget, setAssignTarget]   = useState("all");
   const [saving, setSaving]               = useState(false);
 
- const loadData = async () => {
-  try {
-    const [userRes, assignmentRes] = await Promise.all([
-      userAPI.getAll(),
-      assignmentAPI.getAll(),
-    ]);
+  const loadData = async () => {
+    try {
+      const [{ users }, { assignments }] = await Promise.all([
+        userAPI.getAll(),
+        assignmentAPI.getAll(),
+      ]);
+      setStudents(users);
+      setAllAssignments(assignments);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-    console.log("USER RES:", userRes); // optional debug
-
-    setStudents(userRes.users || []);
-    setAllAssignments(assignmentRes.assignments || []);
-  } catch (err) {
-    console.error(err);
-  }
-};
   useEffect(() => { loadData(); }, []);
 
   const getStudentAssignments = (uid) =>
