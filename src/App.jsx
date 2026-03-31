@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { authAPI, assignmentAPI } from "./api";
 
 import Login          from "./Login";
-import AdminDashboard from "./AdminDashboard";
+import AdminDashboard from "./Admindashboard";
 import AddAssignment  from "./AddAssignment";
 import AssignmentList from "./AssignmentList";
 import Dashboard      from "./Dashboard";
