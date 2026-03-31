@@ -1,8 +1,6 @@
-const express     = require("express");
-const session     = require("express-session");
-const cors        = require("cors");
-const mongoose    = require("mongoose");
-const MongoStore  = require("connect-mongo");
+const express   = require("express");
+const cors      = require("cors");
+const mongoose  = require("mongoose");
 require("dotenv").config();
 
 const authRoutes       = require("./routes/auth");
@@ -22,27 +20,10 @@ mongoose
   .catch((err) => console.error("❌ MongoDB error:", err));
 
 // ── CORS ──
-app.use(cors({
-  origin: true,
-  credentials: true,
-}));
+app.use(cors({ origin: true, credentials: true }));
 
 // ── Middleware ──
 app.use(express.json());
-
-app.use(session({
-  secret: process.env.SESSION_SECRET || "assignment-tracker-secret",
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
-  cookie: {
-    maxAge: 1000 * 60 * 60 * 24 * 7,
-    httpOnly: true,
-    sameSite: "none",
-    secure: true,
-  },
-  proxy: true,
-}));
 
 // ── Routes ──
 app.use("/api/auth",        authRoutes);

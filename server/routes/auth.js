@@ -1,12 +1,20 @@
 const express = require("express");
 const router  = express.Router();
+const jwt     = require("jsonwebtoken");
 const User    = require("../models/User");
+const { requireAuth } = require("../middleware/auth");
+
+const generateToken = (user) =>
+  jwt.sign(
+    { userId: user._id, email: user.email, name: user.name, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "7d" }
+  );
 
 // POST /api/auth/register
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
-
     if (!name || !email || !password)
       return res.status(400).json({ error: "All fields are required" });
 
@@ -14,14 +22,12 @@ router.post("/register", async (req, res) => {
     if (exists)
       return res.status(400).json({ error: "Email already registered" });
 
-    const user = await User.create({ name, email, password, role: "student" });
+    const user  = await User.create({ name, email, password, role: "student" });
+    const token = generateToken(user);
 
-    // Auto login after register
-    req.session.userId = user._id;
-    req.session.role   = user.role;
-
-    res.status(201).json({ user });
+    res.status(201).json({ user, token });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -30,7 +36,6 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-
     if (!email || !password)
       return res.status(400).json({ error: "Email and password required" });
 
@@ -42,31 +47,23 @@ router.post("/login", async (req, res) => {
     if (!match)
       return res.status(401).json({ error: "Incorrect password" });
 
-    req.session.userId = user._id;
-    req.session.role   = user.role;
-
-    res.json({ user });
+    const token = generateToken(user);
+    res.json({ user, token });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-// POST /api/auth/logout
+// POST /api/auth/logout — client just deletes token
 router.post("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    if (err) return res.status(500).json({ error: "Logout failed" });
-    res.clearCookie("connect.sid");
-    res.json({ message: "Logged out" });
-  });
+  res.json({ message: "Logged out" });
 });
 
-// GET /api/auth/me — check current session
-router.get("/me", async (req, res) => {
-  if (!req.session.userId)
-    return res.status(401).json({ error: "Not authenticated" });
-
+// GET /api/auth/me
+router.get("/me", requireAuth, async (req, res) => {
   try {
-    const user = await User.findById(req.session.userId);
+    const user = await User.findById(req.user.userId);
     if (!user) return res.status(404).json({ error: "User not found" });
     res.json({ user });
   } catch (err) {

@@ -3,7 +3,7 @@ const router  = express.Router();
 const User    = require("../models/User");
 const { requireAdmin } = require("../middleware/auth");
 
-// GET /api/users — admin gets all students
+// GET /api/users — admin only
 router.get("/", requireAdmin, async (req, res) => {
   try {
     const users = await User.find({ role: "student" }).sort({ createdAt: -1 });
@@ -13,7 +13,6 @@ router.get("/", requireAdmin, async (req, res) => {
   }
 });
 
-// GET /api/users/:id — admin gets one student
 router.get("/:id", requireAdmin, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -24,7 +23,6 @@ router.get("/:id", requireAdmin, async (req, res) => {
   }
 });
 
-// DELETE /api/users/:id — admin removes a student
 router.delete("/:id", requireAdmin, async (req, res) => {
   try {
     await User.findByIdAndDelete(req.params.id);

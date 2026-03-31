@@ -3,16 +3,15 @@ const router     = express.Router();
 const Assignment = require("../models/Assignment");
 const { requireAuth, requireAdmin } = require("../middleware/auth");
 
-// GET /api/assignments — student gets own, admin gets all
+// GET /api/assignments
 router.get("/", requireAuth, async (req, res) => {
   try {
-    const filter = req.session.role === "admin"
+    const filter = req.user.role === "admin"
       ? {}
-      : { userId: req.session.userId };
+      : { userId: req.user.userId };
 
     const assignments = await Assignment.find(filter)
       .populate("userId", "name email")
-      .populate("assignedBy", "name")
       .sort({ createdAt: -1 });
 
     res.json({ assignments });
@@ -32,25 +31,22 @@ router.get("/student/:userId", requireAdmin, async (req, res) => {
   }
 });
 
-// POST /api/assignments — student adds own, admin assigns to userId
+// POST /api/assignments
 router.post("/", requireAuth, async (req, res) => {
   try {
     const { title, subject, dueDate, userId } = req.body;
+    if (!title) return res.status(400).json({ error: "Title is required" });
 
-    if (!title)
-      return res.status(400).json({ error: "Title is required" });
-
-    // Students can only add to themselves
-    const targetUserId = req.session.role === "admin" && userId
+    const targetUserId = req.user.role === "admin" && userId
       ? userId
-      : req.session.userId;
+      : req.user.userId;
 
     const assignment = await Assignment.create({
       title,
-      subject:    subject    || null,
-      dueDate:    dueDate    ? new Date(dueDate) : null,
+      subject:    subject  || null,
+      dueDate:    dueDate  ? new Date(dueDate) : null,
       userId:     targetUserId,
-      assignedBy: req.session.role === "admin" ? req.session.userId : null,
+      assignedBy: req.user.role === "admin" ? req.user.userId : null,
     });
 
     res.status(201).json({ assignment });
@@ -59,11 +55,10 @@ router.post("/", requireAuth, async (req, res) => {
   }
 });
 
-// POST /api/assignments/bulk — admin assigns to multiple students
+// POST /api/assignments/bulk — admin only
 router.post("/bulk", requireAdmin, async (req, res) => {
   try {
     const { title, subject, dueDate, userIds } = req.body;
-
     if (!title || !userIds?.length)
       return res.status(400).json({ error: "Title and userIds required" });
 
@@ -72,7 +67,7 @@ router.post("/bulk", requireAdmin, async (req, res) => {
       subject:    subject || null,
       dueDate:    dueDate ? new Date(dueDate) : null,
       userId:     uid,
-      assignedBy: req.session.userId,
+      assignedBy: req.user.userId,
       status:     "pending",
       createdAt:  new Date(),
     }));
@@ -84,17 +79,16 @@ router.post("/bulk", requireAdmin, async (req, res) => {
   }
 });
 
-// PATCH /api/assignments/:id — update status or dueDate
+// PATCH /api/assignments/:id
 router.patch("/:id", requireAuth, async (req, res) => {
   try {
     const assignment = await Assignment.findById(req.params.id);
     if (!assignment)
       return res.status(404).json({ error: "Assignment not found" });
 
-    // Students can only update their own
     if (
-      req.session.role !== "admin" &&
-      assignment.userId.toString() !== req.session.userId.toString()
+      req.user.role !== "admin" &&
+      assignment.userId.toString() !== req.user.userId.toString()
     ) {
       return res.status(403).json({ error: "Not allowed" });
     }
@@ -120,8 +114,8 @@ router.delete("/:id", requireAuth, async (req, res) => {
       return res.status(404).json({ error: "Assignment not found" });
 
     if (
-      req.session.role !== "admin" &&
-      assignment.userId.toString() !== req.session.userId.toString()
+      req.user.role !== "admin" &&
+      assignment.userId.toString() !== req.user.userId.toString()
     ) {
       return res.status(403).json({ error: "Not allowed" });
     }
