@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { authAPI, assignmentAPI } from "./api";
 
 import Login          from "./Login";
-import AdminDashboard from "./Admindashboard";
+import AdminDashboard from "./AdminDashboard";
 import AddAssignment  from "./AddAssignment";
 import AssignmentList from "./AssignmentList";
 import Dashboard      from "./Dashboard";
@@ -18,15 +18,22 @@ function App() {
   const [assignments, setAssignments] = useState([]);
   const [activePage, setActivePage]   = useState("tracker");
 
-  // Check existing session on load
+  // Check existing JWT token on load
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setAuthLoading(false);
+      return;
+    }
     authAPI.me()
       .then(({ user }) => setUser(user))
-      .catch(() => setUser(null))
+      .catch(() => {
+        localStorage.removeItem("token");
+        setUser(null);
+      })
       .finally(() => setAuthLoading(false));
   }, []);
 
-  // Load student's own assignments
   const loadAssignments = async () => {
     if (!user || user.role === "admin") return;
     try {
@@ -43,7 +50,7 @@ function App() {
 
   const handleSetUser = async (u) => {
     if (!u) {
-      await authAPI.logout();
+      authAPI.logout();
       setUser(null);
       setAssignments([]);
     } else {
@@ -51,7 +58,6 @@ function App() {
     }
   };
 
-  // ── Loading ──
   if (authLoading) {
     return (
       <div className="auth-loading">
@@ -61,15 +67,12 @@ function App() {
     );
   }
 
-  // ── Not logged in ──
   if (!user) return <Login setUser={handleSetUser} />;
 
-  // ── Admin ──
   if (user.role === "admin") {
     return <AdminDashboard user={user} setUser={handleSetUser} />;
   }
 
-  // ── Student ──
   const renderPage = () => {
     switch (activePage) {
       case "dashboard":

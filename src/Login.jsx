@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { authAPI } from "./api";
 
 function Login({ setUser }) {
-  const [mode, setMode]         = useState("login");   // "login" | "signup"
-  const [role, setRole]         = useState("student"); // "student" | "admin"
+  const [mode, setMode]         = useState("login");
+  const [role, setRole]         = useState("student");
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
   const [name, setName]         = useState("");
@@ -21,7 +21,6 @@ function Login({ setUser }) {
       } else {
         data = await authAPI.login({ email, password });
       }
-      // Check role matches selected tab
       if (role === "admin" && data.user.role !== "admin") {
         setError("This account does not have admin access.");
         setLoading(false);
@@ -37,13 +36,11 @@ function Login({ setUser }) {
   return (
     <div className="login-page">
       <div className="login-card">
-
         <div className="login-brand">
           <div className="login-logo">AT</div>
           <div className="login-brand-name">Assignment Tracker</div>
         </div>
 
-        {/* Role toggle */}
         <div className="role-toggle">
           <button
             className={`role-btn ${role === "student" ? "active" : ""}`}
@@ -55,7 +52,6 @@ function Login({ setUser }) {
           >🛡 Admin</button>
         </div>
 
-        {/* Sign in / Sign up tabs (students only) */}
         {role === "student" && (
           <div className="mode-toggle">
             <button
@@ -85,7 +81,6 @@ function Login({ setUser }) {
               />
             </div>
           )}
-
           <div className="inputBox">
             <input
               type="email"
@@ -95,7 +90,6 @@ function Login({ setUser }) {
               required
             />
           </div>
-
           <div className="inputBox">
             <input
               type="password"
@@ -105,23 +99,15 @@ function Login({ setUser }) {
               required
             />
           </div>
-
           {error && <div className="login-error">{error}</div>}
-
           <button className="loginBtn" type="submit" disabled={loading}>
-            {loading
-              ? "Please wait..."
-              : role === "admin"
-              ? "Login as Admin"
-              : mode === "signup"
-              ? "Create Account"
-              : "Sign In"}
+            {loading ? "Please wait..." : role === "admin" ? "Login as Admin" : mode === "signup" ? "Create Account" : "Sign In"}
           </button>
         </form>
 
         {role === "admin" && (
           <div className="login-hint">
-            Admin accounts are created by the system administrator.
+            Admin credentials are set by your system administrator.
           </div>
         )}
       </div>

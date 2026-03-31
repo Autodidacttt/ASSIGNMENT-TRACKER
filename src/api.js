@@ -1,13 +1,20 @@
-// Central API helper — replaces all Firebase calls
+// Central API helper — uses JWT tokens instead of sessions
 const BASE = "https://assignment-tracker-production-b915.up.railway.app/api";
 
 const api = async (path, options = {}) => {
+  // Get token from localStorage
+  const token = localStorage.getItem("token");
+
   const res = await fetch(`${BASE}${path}`, {
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      // Send JWT token in Authorization header
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
     ...options,
     body: options.body ? JSON.stringify(options.body) : undefined,
   });
+
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Request failed");
   return data;
@@ -15,10 +22,24 @@ const api = async (path, options = {}) => {
 
 // ── Auth ──────────────────────────────────────────
 export const authAPI = {
-  me:       ()      => api("/auth/me"),
-  login:    (body)  => api("/auth/login",    { method: "POST", body }),
-  register: (body)  => api("/auth/register", { method: "POST", body }),
-  logout:   ()      => api("/auth/logout",   { method: "POST" }),
+  me: () => api("/auth/me"),
+
+  login: async (body) => {
+    const data = await api("/auth/login", { method: "POST", body });
+    if (data.token) localStorage.setItem("token", data.token);
+    return data;
+  },
+
+  register: async (body) => {
+    const data = await api("/auth/register", { method: "POST", body });
+    if (data.token) localStorage.setItem("token", data.token);
+    return data;
+  },
+
+  logout: () => {
+    localStorage.removeItem("token");
+    return Promise.resolve();
+  },
 };
 
 // ── Assignments ───────────────────────────────────
